@@ -1,0 +1,142 @@
+**Kind Setup:**
+
+* To install Kind we need Pre-installations
+    1. Golang
+    2. Docker
+
+**Install Golang:**
+
+* Download the latest Golang from the website: https://golang.org/dl/ 
+
+   $ wget https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
+
+* un-tar the downloaded file to a particular path:
+
+   $ tar zxf go1.15.2.linux-amd64.tar.gz -C /usr/local
+
+* Export the path run the Go cmds
+  
+   $ export PATH=$PATH:/usr/local/go/bin
+
+* Check Golang Version
+
+   $ go version
+      go version go1.15.2 linux/amd64
+   $ export PATH=$PATH:/usr/local/go/bin
+
+**Install Docker:**
+
+* Update the apt package index and install packages to allow apt to use a repository
+
+   $ sudo apt-get update
+
+   $ sudo apt-get install \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      gnupg-agent \
+      software-properties-common
+
+* Add Docker’s official GPG key:
+
+   $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+* Verify that you now have the key with the fingerprint
+
+   $ sudo apt-key fingerprint 0EBFCD88
+
+      pub   rsa4096 2017-02-22 [SCEA]
+              9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
+      uid           [ unknown] Docker Release (CE deb) <docker@docker.com>
+      sub   rsa4096 2017-02-22 [S]
+
+* Use the following command to set up the stable repository.
+
+   $ sudo add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+
+* Install Docker Engine
+
+   $ sudo apt-get update
+   $ sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+* Verify that Docker Engine is installed correctly by running the hello-world image.
+
+   $ sudo docker run hello-world
+
+* docker --version
+
+   Docker version 19.03.12, build 48a66213fe
+
+**Install Kind Config**
+
+* Install Kind using Golang
+  
+  GO111MODULE="on" go get sigs.k8s.io/kind@v0.9.0
+
+**Install Kubectl Config**
+
+* Download the latest release with the command:
+
+   $ curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes- 
+     release/release/stable.txt)/bin/linux/amd64/kubectl"
+
+* Make the kubectl binary executable.
+  
+   $ chmod +x ./kubectl
+
+* Move the binary into your PATH
+  
+   $ sudo mv ./kubectl /usr/local/bin/kubectl
+
+* Test to ensure the version you installed is up-to-date:
+
+   $ kubectl version --client
+
+
+* Create Cluster Using Kind
+
+   $ kind create cluster
+
+* When you list your kind clusters, you will see something like the following:
+  
+   $ kind get clusters
+     kind
+
+* In order to interact with a specific cluster, you only need to specify the cluster name as a context in kubectl:
+
+   $ kubectl cluster-info --context kind-kind
+
+
+**Multi-node Clusters**
+
+* For a sample create file kind-example-config.yaml 
+
+# Three node (two workers) cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+
+* Run the below command to create a multi-node cluster
+
+   $ kind create cluster --config kind-example-config.yaml
+
+**Control-plane HA Setup**
+
+* You can also have a cluster with multiple control-plane nodes:
+
+# Cluster with 3 control-plane nodes and 3 workers
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: control-plane
+- role: control-plane
+- role: worker
+- role: worker
+- role: worker
