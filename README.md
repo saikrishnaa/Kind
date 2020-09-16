@@ -1,4 +1,4 @@
-**Kind**
+#Kind Setup
 
 *Links*
 
